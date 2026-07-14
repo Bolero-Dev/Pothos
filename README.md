@@ -1,14 +1,15 @@
 # Pothos
 
-Collect everything Windows knows about an app's failures — in one click.
+Everything Windows knows about an app's failures, collected in one click.
 
-When an application misbehaves, the evidence is scattered: error and hang events
-buried in Event Viewer, crash dumps in `%LOCALAPPDATA%\CrashDumps`, WER reports
-under `ProgramData`. Gathering it by hand is slow, repetitive, and easy to get
-wrong — exactly the kind of friction QA time disappears into.
+When an application misbehaves, the evidence is scattered all over the place:
+error and hang events buried in Event Viewer, crash dumps in
+`%LOCALAPPDATA%\CrashDumps`, WER reports under `ProgramData`. Collecting it by
+hand is slow, repetitive, and easy to get wrong — the kind of chore QA time
+quietly disappears into. I got tired of doing it by hand, so I made the
+computer do it.
 
-Pothos removes it. Enter the executable, pick a time window, choose whether to
-compress, and click Collect. You get one folder:
+Enter the executable, pick a time window, click Collect. You get one folder:
 
 ```
 myapp_pothos_20260706_141530/
@@ -22,9 +23,10 @@ myapp_pothos_20260706_141530/
 ```
 
 Click a row in the PDF and the exact error opens in Notepad. Hand the folder
-(or the zip) to a developer and the bug report writes itself.
+(or the zip) to a developer and the bug report basically writes itself.
 
-> Named after the pothos plant — thrives in dark corners and cleans the air.
+> Named after the pothos plant — it thrives in dark corners and cleans the
+> air. So does this.
 
 ## Run it
 
@@ -43,11 +45,11 @@ pip install pytest reportlab
 pytest
 ```
 
-27 tests, no Windows required: the Event Log and WER seams are injected, so the
-parser is tested against realistic `wevtutil` XML fixtures, dump discovery
-against temporary directory layouts, and the full collection run (folder
-structure, per-event files, PDF links, zip round-trip) against a fake source.
-CI runs the suite on every push.
+27 tests, and none of them need Windows: the Event Log and WER lookups sit
+behind injectable seams, so the parser runs against realistic `wevtutil` XML
+fixtures, dump discovery runs against temporary directory layouts, and the full
+collection run (folder structure, per-event files, PDF links, zip round-trip)
+runs against a fake source. CI runs the suite on every push.
 
 ## Architecture
 
@@ -60,16 +62,18 @@ pothos/collector.py      orchestration: folder layout, event files, zip
 pothos/report.py         the PDF summary; rows link to per-event files
 ```
 
-Design notes: Notepad has no jump-to-line option, so instead of one giant log,
-each error is extracted to its own small file and the PDF links to it — the
-click lands on exactly the error in question. The core never imports tkinter,
-and everything OS-specific sits behind two injectable seams.
+One design choice worth explaining: Notepad has no jump-to-line, so instead of
+one giant log, every error gets its own small file and the PDF links straight
+to it. The click lands on exactly the error in question — no scrolling, no
+searching. The core never imports tkinter, and everything OS-specific sits
+behind two seams you can swap out.
 
-## Origin
+## The origin story
 
-Rebuilt from scratch after the original (written during hardware/software
-validation work) was lost. The second version gained what the first never had:
-a full test suite and CI.
+I wrote the first version of Pothos during hardware/software validation work,
+and then I lost it. This is the rebuild — and the rebuild got what the
+original never had: a full test suite and CI. Losing the code hurt; finding
+out the design was worth rebuilding from memory didn't.
 
 ---
 
